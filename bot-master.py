@@ -16,7 +16,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-client = commands.Bot(command_prefix='$$')
+client = commands.Bot(command_prefix='$')
 
 
 @client.event
@@ -47,13 +47,23 @@ async def randPic(context):
 
 @client.command(name='connect')
 async def joinVocie(context):
-	if context.message.author.voice:
+	if client.voice_clients:
+		if context.message.author.voice.channel == client.voice_clients[0].channel:
+			await context.message.channel.send("Already connected to your voice channel!")
+		else:
+			for joinedChannel in client.voice_clients:
+				await joinedChannel.disconnect()
+			await context.message.author.voice.channel.connect()
+
+	elif context.message.author.voice:
 		await context.message.author.voice.channel.connect()
+		await context.message.channel.send(f'Joined the {context.message.author.voice.channel.name} voice channel!')
 
 @client.command(name='disconnect')
 async def leaveVoice(context):	
 	for joinedChannel in client.voice_clients:
 		await joinedChannel.disconnect()
+		await context.message.channel.send("Successfully disconnected from voice channel.")
 
 @client.event
 async def on_message(message):
