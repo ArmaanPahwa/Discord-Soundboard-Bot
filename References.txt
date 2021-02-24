@@ -1,0 +1,7 @@
+The following resources were referenced when creating the code:
+
+Discord.py API Documentaion- https://discordpy.readthedocs.io/en/latest/index.html
+
+Ajay Gandecha - https://www.youtube.com/playlist?list=PLfpeXtDSa8rWW02LOjl2IW9_TLfcp_mZr
+Beau Carnes - https://www.freecodecamp.org/news/create-a-discord-bot-with-python/
+Alex Ronquillo - https://realpython.com/how-to-make-a-discord-bot-python/
