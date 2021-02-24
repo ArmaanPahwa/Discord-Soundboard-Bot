@@ -35,6 +35,7 @@ def get_quote():
 
 @client.command(name='logout')
 async def logout(context):
+	await leaveVoice(context)
 	await context.message.channel.send("Bot signing off...")
 	await client.change_presence(status=discord.Status.offline)
 	await client.logout()
