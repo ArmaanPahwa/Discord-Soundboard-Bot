@@ -45,6 +45,16 @@ async def randPic(context):
 	randomChoice = random.choice(pics)
 	await context.message.channel.send(file=discord.File(randomChoice))
 
+@client.command(name='connect')
+async def joinVocie(context):
+	if context.message.author.voice:
+		await context.message.author.voice.channel.connect()
+
+@client.command(name='disconnect')
+async def leaveVoice(context):	
+	for joinedChannel in client.voice_clients:
+		await joinedChannel.disconnect()
+
 @client.event
 async def on_message(message):
 	if message.author == client:
