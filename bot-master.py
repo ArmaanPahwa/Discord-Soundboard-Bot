@@ -16,7 +16,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-client = commands.Bot(command_prefix='$$')
+client = commands.Bot(command_prefix='$')
 
 
 @client.event
@@ -35,6 +35,7 @@ def get_quote():
 
 @client.command(name='logout')
 async def logout(context):
+	await leaveVoice(context)
 	await context.message.channel.send("Bot signing off...")
 	await client.change_presence(status=discord.Status.offline)
 	await client.logout()
@@ -44,6 +45,27 @@ async def randPic(context):
 	pics = ["pic1.jpg", "gif1.gif", "gif2.gif", "gif3.gif"]
 	randomChoice = random.choice(pics)
 	await context.message.channel.send(file=discord.File(randomChoice))
+
+@client.command(name='connect')
+async def joinVocie(context):
+	if not context.message.author.voice:
+		await context.message.channel.send("You are not connected to a voice channel.")
+	elif client.voice_clients:
+		if context.message.author.voice.channel == client.voice_clients[0].channel:
+			await context.message.channel.send("Already connected to your voice channel!")
+		else:
+			for joinedChannel in client.voice_clients:
+				await joinedChannel.disconnect()
+			await context.message.author.voice.channel.connect()
+	else:
+		await context.message.author.voice.channel.connect()
+		await context.message.channel.send(f'Joined the {context.message.author.voice.channel.name} voice channel!')
+
+@client.command(name='disconnect')
+async def leaveVoice(context):	
+	for joinedChannel in client.voice_clients:
+		await joinedChannel.disconnect()
+		await context.message.channel.send("Successfully disconnected from voice channel.")
 
 @client.event
 async def on_message(message):
