@@ -48,18 +48,18 @@ async def randPic(context):
 
 @client.command(name='connect')
 async def joinVocie(context):
-	if client.voice_clients:
+	if not context.message.author.voice:
+		await context.message.channel.send("You are not connected to a voice channel.")
+	elif client.voice_clients:
 		if context.message.author.voice.channel == client.voice_clients[0].channel:
 			await context.message.channel.send("Already connected to your voice channel!")
 		else:
 			for joinedChannel in client.voice_clients:
 				await joinedChannel.disconnect()
 			await context.message.author.voice.channel.connect()
-	elif context.message.author.voice:
+	else:
 		await context.message.author.voice.channel.connect()
 		await context.message.channel.send(f'Joined the {context.message.author.voice.channel.name} voice channel!')
-	else:
-		await context.message.channel.send("You are not connected to a voice channel.")
 
 @client.command(name='disconnect')
 async def leaveVoice(context):	
