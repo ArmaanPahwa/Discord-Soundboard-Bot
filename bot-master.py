@@ -55,10 +55,11 @@ async def joinVocie(context):
 			for joinedChannel in client.voice_clients:
 				await joinedChannel.disconnect()
 			await context.message.author.voice.channel.connect()
-
 	elif context.message.author.voice:
 		await context.message.author.voice.channel.connect()
 		await context.message.channel.send(f'Joined the {context.message.author.voice.channel.name} voice channel!')
+	else:
+		await context.message.channel.send("You are not connected to a voice channel.")
 
 @client.command(name='disconnect')
 async def leaveVoice(context):	
