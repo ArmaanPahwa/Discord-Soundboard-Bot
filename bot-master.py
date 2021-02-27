@@ -52,9 +52,7 @@ async def joinVocie(context):
 	if not context.message.author.voice:
 		await context.message.channel.send("You are not connected to a voice channel.")
 	elif client.voice_clients:
-		if context.message.author.voice.channel == client.voice_clients[0].channel:
-			await context.message.channel.send("Already connected to your voice channel!")
-		else:
+		if context.message.author.voice.channel != client.voice_clients[0].channel:
 			for joinedChannel in client.voice_clients:
 				await joinedChannel.disconnect()
 			await context.message.author.voice.channel.connect()
@@ -70,15 +68,25 @@ async def leaveVoice(context):
 
 @client.command(name='play')
 async def play(context):
-	currentVoice = client.voice_clients[0]
-	source = FFmpegPCMAudio('audioSource.mp3')
-	player = currentVoice.play(source)
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if not currentVoice.is_playing():
+			source = FFmpegPCMAudio('audioSource.mp3')
+			player = currentVoice.play(source)
+		else:
+			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
 
 @client.command(name='stop')
 async def stop(context):
-	currentVoice = client.voice_clients[0]
-	currentVoice.stop()
-
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if currentVoice.is_playing():
+			currentVoice.stop()
+		else:
+			await context.message.channel.send("No audio is currently playing!")
+	else:
+		await context.message.channel.send("No audio is currently playing!")
+		
 @client.event
 async def on_message(message):
 	if message.author == client:
