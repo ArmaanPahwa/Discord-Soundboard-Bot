@@ -10,6 +10,7 @@ import io
 import aiohttp
 
 from discord.ext import commands
+from discord import FFmpegPCMAudio
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -66,6 +67,17 @@ async def leaveVoice(context):
 	for joinedChannel in client.voice_clients:
 		await joinedChannel.disconnect()
 		await context.message.channel.send("Successfully disconnected from voice channel.")
+
+@client.command(name='play')
+async def play(context):
+	currentVoice = client.voice_clients[0]
+	source = FFmpegPCMAudio('audioSource.mp3')
+	player = currentVoice.play(source)
+
+@client.command(name='stop')
+async def stop(context):
+	currentVoice = client.voice_clients[0]
+	currentVoice.stop()
 
 @client.event
 async def on_message(message):
