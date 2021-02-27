@@ -62,13 +62,9 @@ async def joinVoice(context):
 
 @client.command(name='disconnect')
 async def leaveVoice(context):
-	if client.voice_clients:	
-		for joinedChannel in client.voice_clients:
-			await joinedChannel.disconnect()
-			await context.message.channel.send("Successfully disconnected from voice channel.")
-	else:
-		await context.message.channel.send("Not currently connected to a voice channel.")
-	
+	for joinedChannel in client.voice_clients:
+		await joinedChannel.disconnect()
+		await context.message.channel.send("Successfully disconnected from voice channel.")
 
 @client.command(name='play')
 async def play(context):
@@ -89,9 +85,33 @@ async def stop(context):
 			currentVoice.stop()
 			await currentVoice.disconnect()
 		else:
-			await context.message.channel.send("No audio is currently playing!")
+			await context.message.channel.send("No audio is currently playing.")
 	else:
-		await context.message.channel.send("No audio is currently playing!")
+		await context.message.channel.send("No audio is currently playing.")
+
+@client.command(name='pause')
+async def pause_audio(context):
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if currentVoice.is_playing():
+			currentVoice.pause()
+			await context.message.channel.send("Audio has been paused!")
+		else:
+			await context.message.channel.send("No audio is currently playing.")
+	else:
+		await context.message.channel.send("No audio is currently playing.")
+
+@client.command(name='resume')
+async def resume_audio(context):
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if currentVoice.is_paused():
+			currentVoice.resume()
+			await context.message.channel.send("Audio has been resumed!")
+		else:
+			await context.message.channel.send("No audio is currently playing.")
+	else:
+		await context.message.channel.send("No audio is currently playing.")
 
 @client.event
 async def on_message(message):
