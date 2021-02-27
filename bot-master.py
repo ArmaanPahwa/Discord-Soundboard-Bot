@@ -48,7 +48,7 @@ async def randPic(context):
 	await context.message.channel.send(file=discord.File(randomChoice))
 
 @client.command(name='connect')
-async def joinVocie(context):
+async def joinVoice(context):
 	if not context.message.author.voice:
 		await context.message.channel.send("You are not connected to a voice channel.")
 	elif client.voice_clients:
@@ -61,13 +61,18 @@ async def joinVocie(context):
 		await context.message.channel.send(f'Joined the {context.message.author.voice.channel.name} voice channel!')
 
 @client.command(name='disconnect')
-async def leaveVoice(context):	
-	for joinedChannel in client.voice_clients:
-		await joinedChannel.disconnect()
-		await context.message.channel.send("Successfully disconnected from voice channel.")
+async def leaveVoice(context):
+	if client.voice_clients:	
+		for joinedChannel in client.voice_clients:
+			await joinedChannel.disconnect()
+			await context.message.channel.send("Successfully disconnected from voice channel.")
+	else:
+		await context.message.channel.send("Not currently connected to a voice channel.")
+	
 
 @client.command(name='play')
 async def play(context):
+	await joinVoice(context)
 	if client.voice_clients:
 		currentVoice = client.voice_clients[0]
 		if not currentVoice.is_playing():
@@ -82,11 +87,12 @@ async def stop(context):
 		currentVoice = client.voice_clients[0]
 		if currentVoice.is_playing():
 			currentVoice.stop()
+			await currentVoice.disconnect()
 		else:
 			await context.message.channel.send("No audio is currently playing!")
 	else:
 		await context.message.channel.send("No audio is currently playing!")
-		
+
 @client.event
 async def on_message(message):
 	if message.author == client:
