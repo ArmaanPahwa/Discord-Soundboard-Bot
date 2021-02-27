@@ -5,9 +5,6 @@ import os
 import discord
 import requests
 import json
-import random
-import io
-import aiohttp
 
 from discord.ext import commands
 from discord import FFmpegPCMAudio
@@ -40,12 +37,6 @@ async def logout(context):
 	await context.message.channel.send("Bot signing off...")
 	await client.change_presence(status=discord.Status.offline)
 	await client.logout()
-
-@client.command(name='pic')
-async def randPic(context):
-	pics = ["pic1.jpg", "gif1.gif", "gif2.gif", "gif3.gif"]
-	randomChoice = random.choice(pics)
-	await context.message.channel.send(file=discord.File(randomChoice))
 
 @client.command(name='connect')
 async def joinVoice(context):
