@@ -3,19 +3,14 @@
 # bot-master.py
 import os
 import discord
-import requests
-import json
-
 from discord.ext import commands
 from discord import FFmpegPCMAudio
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
 
 client = commands.Bot(command_prefix='$')
-
 
 @client.event
 async def on_ready():
@@ -23,13 +18,7 @@ async def on_ready():
 	guild = discord.utils.get(client.guilds, name=GUILD)
 	print(f'{client.user.name} is connected to the following server:\n')
 	print(f'{guild.name}(id:{guild.id})')
-	await client.change_presence(activity=discord.Game("In the creation lab."))
-
-def get_quote():
-	response = requests.get("https://zenquotes.io/api/random")
-	json_data = json.loads(response.text)
-	quote = json_data[0]['q'] + " -" + json_data[0]['a']
-	return quote
+	await client.change_presence(activity=discord.Game("Jamming out to music"))
 
 @client.command(name='logout')
 async def logout(context):
@@ -111,10 +100,6 @@ async def on_message(message):
 
 	if message.content.startswith('hello bot'):
 		await message.channel.send(f'Hello {message.author.mention}!')
-
-	if message.content.startswith('inspire me'):
-		quote = get_quote()
-		await message.channel.send(quote)
 	
 	await client.process_commands(message)
 
