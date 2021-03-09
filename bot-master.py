@@ -100,7 +100,7 @@ async def resume_audio(context):
 			currentVoice.resume()
 			await context.message.channel.send("Audio has been resumed!")
 		else:
-			await context.message.channel.send("No audio is currently playing.")
+			await context.message.channel.send("No audio has been paused.")
 	else:
 		await context.message.channel.send("No audio is currently playing.")
 
