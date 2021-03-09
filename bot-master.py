@@ -3,8 +3,6 @@
 # bot-master.py
 import os
 import discord
-
-
 from discord.ext import commands
 from discord import FFmpegPCMAudio
 from dotenv import load_dotenv
@@ -15,14 +13,13 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 client = commands.Bot(command_prefix='$')
 
-
 @client.event
 async def on_ready():
 	print(f'{client.user.name} has connected to Discord!')
 	guild = discord.utils.get(client.guilds, name=GUILD)
 	print(f'{client.user.name} is connected to the following server:\n')
 	print(f'{guild.name}(id:{guild.id})')
-	await client.change_presence(activity=discord.Game("In the creation lab."))
+	await client.change_presence(activity=discord.Game("Jamming out to music"))
 
 @client.command(name='logout')
 async def logout(context):
