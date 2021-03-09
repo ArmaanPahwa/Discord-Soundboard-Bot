@@ -3,7 +3,7 @@
 Enhance your discord experience with this Discord Soundboard Bot! This bot will allow users to create their own custom sounboards and store their favorite sounds to play in voice channels at anytime!
 
 ## Current Functionality
-- Join Discord voice-chat
+- Join Discord Guild/Server's voice-chat
 - Play local audio file indentified in Source code
 
 ## To-Do
@@ -15,6 +15,7 @@ Enhance your discord experience with this Discord Soundboard Bot! This bot will 
 ## Technologies Used
 - **[VScode](https://code.visualstudio.com/)**: Code editor
 - **[Discord](https://discord.com/)**: Digital communication application
+- **[FFmpeg](https://ffmpeg.org/download.html)**: Audio source converter
 
 ## How to use
 This bot is to be used on the [Discord](https://discord.com/) platform. As such, you must create an account to be able to use the application and bot. 
