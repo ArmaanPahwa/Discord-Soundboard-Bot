@@ -55,7 +55,6 @@ If this package was not installed, open the `bot-master.py` in an editor and do 
 1. Delete the following lines of code:
    ```shell
    from dotenv import load_dotenv
-   
    load_dotenv()
    TOKEN = os.getenv('DISCORD_TOKEN')
    ```
