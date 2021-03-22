@@ -2,6 +2,8 @@
 
 # bot-master.py
 import os
+import youtube_dl
+
 import discord
 from discord.ext import commands
 from discord import FFmpegPCMAudio
@@ -9,6 +11,7 @@ from discord import FFmpegPCMAudio
 from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+GUILD = os.getenv('DISCORD_GUILD')
 
 client = commands.Bot(command_prefix='$')
 
@@ -56,6 +59,24 @@ async def play(context):
 			player = currentVoice.play(source)
 		else:
 			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
+
+
+async def youtube_download(url):
+	ydl_opts = {
+		'format': 'bestaudio/best',
+		'postprocessors': [{
+			'key': 'FFmpegExtractAudio',
+			'preferredcodec': 'mp3',
+			'preferredquality': '192',
+		}],
+	}
+	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+		ydl.download([url])
+
+
+@client.command(name='download')
+async def download(context, url):
+	await youtube_download(url)
 
 @client.command(name='stop')
 async def stop(context):
