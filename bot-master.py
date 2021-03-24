@@ -2,6 +2,7 @@
 
 # bot-master.py
 import os
+from functools import partial
 import youtube_dl
 
 import discord
@@ -48,7 +49,9 @@ class YoutubeSource(discord.PCMVolumeTransformer):
 	
 	@classmethod
 	async def stream_url(cls, url, *, loop=None, download=False):
-		data = ytdl.extract_info(url, download)
+		loop = loop
+		command = partial(ytdl.extract_info, url=url, download=download)
+		data = await loop.run_in_executor(None, command)
 		if 'entries' in data:
 			data = data['entries'][0]
 		return cls(discord.FFmpegPCMAudio(data['url'], **ffmpeg_options), data=data)
