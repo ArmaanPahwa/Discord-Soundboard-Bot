@@ -2,6 +2,9 @@
 
 # bot-master.py
 import os
+from functools import partial
+import youtube_dl
+
 import discord
 from discord.ext import commands
 from discord import FFmpegPCMAudio
@@ -9,6 +12,49 @@ from discord import FFmpegPCMAudio
 from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+GUILD = os.getenv('DISCORD_GUILD')
+
+ytdl_options = {
+	'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0', 
+	'postprocessors': [{
+			'key': 'FFmpegExtractAudio',
+			'preferredcodec': 'mp3',
+			'preferredquality': '192',
+		}]
+}
+
+ffmpeg_options = {
+	'before_options': '-nostdin',
+	'options': '-vn'
+}
+
+ytdl = youtube_dl.YoutubeDL(ytdl_options)
+
+class YoutubeSource(discord.PCMVolumeTransformer):
+	def __init__(self, source, *, data, volume=1.0):
+		super().__init__(source, volume)
+		self.data = data
+		self.title = data.get('title')
+		self.url = data.get('webpage_url')
+	
+	@classmethod
+	async def stream_url(cls, url, *, loop=None, download=False):
+		loop = loop
+		command = partial(ytdl.extract_info, url=url, download=download)
+		data = await loop.run_in_executor(None, command)
+		if 'entries' in data:
+			data = data['entries'][0]
+		return cls(discord.FFmpegPCMAudio(data['url'], **ffmpeg_options), data=data)
 
 client = commands.Bot(command_prefix='$')
 
@@ -54,6 +100,36 @@ async def play(context):
 		if not currentVoice.is_playing():
 			source = FFmpegPCMAudio('audioSource.mp3')
 			player = currentVoice.play(source)
+		else:
+			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
+
+
+async def youtube_download(url):
+	ydl_opts = {
+		'format': 'bestaudio/best',
+		'postprocessors': [{
+			'key': 'FFmpegExtractAudio',
+			'preferredcodec': 'mp3',
+			'preferredquality': '192',
+		}],
+	}
+	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+		ydl.download([url])
+
+
+@client.command(name='download')
+async def download(context, url):
+	await youtube_download(url)
+
+@client.command(name='stream')
+async def youtube_stream(context, url):
+	player = await YoutubeSource.stream_url(url, loop=client.loop, download=False)
+	await joinVoice(context)
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if not currentVoice.is_playing():
+			currentVoice.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+			await context.message.channel.send(f'Now playing: {player.title}')
 		else:
 			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
 
