@@ -5,9 +5,9 @@ Enhance your discord experience with this Discord Soundboard Bot! This bot will 
 ## Current Functionality
 - Join Discord Guild/Server's voice-chat
 - Play local audio file indentified in Source code
+- Play audio from remote source
 
 ## To-Do
-- Play audio from remote source
 - Create separate soundboard for each user
 - Ability to manipulate user soundboard
 - Admin controls
