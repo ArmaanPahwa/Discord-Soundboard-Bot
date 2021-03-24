@@ -91,3 +91,4 @@ The following resources were referenced when developing the code:
 - [Ajay Gandecha](https://www.youtube.com/playlist?list=PLfpeXtDSa8rWW02LOjl2IW9_TLfcp_mZr): Youtube series for basic discord bot functionality
 - [Beau Carnes, Freecodecamp.org](https://www.freecodecamp.org/news/create-a-discord-bot-with-python/): Guide for beginners creating a discord bot
 - [Alex Ronquillo, realpython.com](https://realpython.com/how-to-make-a-discord-bot-python/): Guide for beginners creating a discord bot
+- [Official discord.py Github](https://github.com/Rapptz/discord.py): Official discord.py github for developers to reference
