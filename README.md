@@ -78,7 +78,8 @@ You should now be able to run the `bot-master.py` with full functionality throug
   - FFmpeg is required to convert audio into a format Discord can understand. Please reference either of the following guides for how to install FFmpeg and add it to PATH:
     - Windows: [WindowsLoop.com](https://windowsloop.com/install-ffmpeg-windows-10/)
     - Linux: [Ubuntu Pit](https://www.ubuntupit.com/how-to-install-and-use-ffmpeg-on-linux-distros-beginners-guide/)
-
+- [youtube_dl](https://youtube-dl.org/) `pip install -U youtube_dl`
+  - youtube_dl is required to download and stream audio clips from youtube
 ## Contributing
 ### Bugs or Features
 You can open a new issue [through this](https://github.com/ArmaanPahwa/Discord-Soundboard-Bot/issues/new) with the information and description.
