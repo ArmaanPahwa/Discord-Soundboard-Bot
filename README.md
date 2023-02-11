@@ -1,16 +1,13 @@
-# Discord-Soundboard-Bot
+# Discord-Musicbot
 
-Enhance your discord experience with this Discord Soundboard Bot! This bot will allow users to create their own custom sounboards and store their favorite sounds to play in voice channels at anytime!
+Enhance your discord experience with this Discord Musicbot! This bot will allow users to listen to their own custom music downloads and links in any of their voicechannels! 
 
 ## Current Functionality
 - Join Discord Guild/Server's voice-chat
-- Play local audio file indentified in Source code
-- Play audio from remote source
 
 ## To-Do
-- Create separate soundboard for each user
-- Ability to manipulate user soundboard
-- Admin controls
+- Play local audio file indentified in Source code
+- Play audio from remote source
 
 ## Technologies Used
 - **[VScode](https://code.visualstudio.com/)**: Code editor
@@ -25,7 +22,7 @@ Once an account is created, follow these steps:
 1. Navigate to the [Discord Developer Portal](https://discord.com/developers/applications).
 2. Click the "Create Application" button at the top right.
 3. Give a ***unique name*** to your application and click the create button.
-4. Once created, navigate to the bot tab.
+4. Once created, navigate to the `BOT` tab on the left menu.
 5. Click on "Add Bot" and then confirm with "Yes, do it!".
 6. Your bot has been created!
 
@@ -37,6 +34,11 @@ With the bot now being created, you must add it to your Discord Guild/Server. Fo
 4. In the scopes section, click copy next to the generated link.
 5. Paste the link into a new tab and select your Guild/Server to join.
 
+### Update Bot Permissions
+To properly allow your bot to interact, we must update the intents of the bot.
+1. Navigate to the `BOT` tab on the left menu.
+2. Scroll down to the Privileged Gateway Intents section
+3. Select the radio button for PRESENCE INTENT, SERVER MEMBERS INTENT, and MESSAGE CONTENT INTENT
 
 ### Installing/Managing Packages
 Your bot now has access to your Guild/Server. The final steps to get the bot running is as follows:
@@ -65,7 +67,7 @@ If this package was not installed, open the `bot-master.py` in an editor and do 
    ```
 
 ### Running the Bot
-You should now be able to run the `bot-master.py` with full functionality through command-line!
+You should now be able to run the `bot.py` with full functionality through command-line!
 
 ## Packages
 ***Ensure you have [Python](https://www.python.org/downloads/) Downloaded***
