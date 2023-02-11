@@ -10,8 +10,10 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-#Setup client prefix & Intents
+#Setup client prefix & Intents, queue
 client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+music_queue = []
+current_song = ""
 
 # --- SETUP EVENT ---
 @client.event
@@ -73,6 +75,36 @@ async def stop(context):
 			await context.message.channel.send("No audio is currently playing.")
 	else:
 		await context.message.channel.send("No audio is currently playing.")
+
+@client.command(name='add')
+async def add(context):
+    title = context.message.content
+    title = title.replace('!add ', '')
+    music_queue.append(title)
+    await context.message.channel.send(f'Added song: `{title}` to the queue.')
+
+@client.command(name='remove')
+async def remove(context):
+    position = context.message.content
+    position = position.replace('!remove ', '')
+    try:
+        pos = int(position)
+        pos -= 1 #If 1 is entered, position in list is 0
+        if pos < 0 or pos >= len(music_queue):
+            await context.message.channel.send(f'Error, please enter a valid position')
+        else:
+            title = music_queue.pop(pos)
+            await context.message.channel.send(f'Removed song: `{title}`')
+    except ValueError:
+        await context.message.channel.send(f"Please enter a valid numerical input {context.message.author.mention}")
+
+@client.command(name='queue')
+async def showQueue(context):
+    embed = discord.Embed(title=f'Music Queue', colour=discord.Colour.blue())
+    embed.add_field(name='Current song\n', value=current_song)
+    embed.add_field(name='\nNext songs', value=f'\n'.join(music_queue))
+    await context.message.channel.send(embed=embed)
+
 
 # --- MESSAGE HANDLING ---
 @client.event
