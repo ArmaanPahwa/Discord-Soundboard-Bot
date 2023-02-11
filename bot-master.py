@@ -1,6 +1,8 @@
 import os
 import discord
+import music
 from discord.ext import commands
+from discord import FFmpegPCMAudio
 
 ### SET-UP Envoirnmental Variables
 from dotenv import load_dotenv
@@ -11,7 +13,7 @@ GUILD = os.getenv('DISCORD_GUILD')
 #Setup client prefix & Intents
 client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
 
-#Event for when bot is ready
+# --- SETUP EVENT ---
 @client.event
 async def on_ready():
     print(f'{client.user.name} has connected to Discord!')
@@ -20,6 +22,7 @@ async def on_ready():
         print(f'{guild.name}(id:{guild.id})')
     await client.change_presence(activity=discord.Game("Jamming out to music"))
 
+### --- CONNECT AND DISCONNECT COMMANDS ---
 @client.command(name='connect')
 async def joinVoice(context):
 	if not context.message.author.voice:
@@ -39,6 +42,7 @@ async def leaveVoice(context):
 		await joinedChannel.disconnect()
 		await context.message.channel.send("Successfully disconnected from voice channel.")
 
+### --- LOGOUT COMMAND ---
 @client.command(name='logout')
 async def logout(context):
 	await leaveVoice(context)
@@ -46,7 +50,31 @@ async def logout(context):
 	await client.change_presence(status=discord.Status.offline)
 	await client.close()
 
-#Event for each message
+### --- MUSIC COMMANDS ---
+@client.command(name='play')
+async def play(context):
+	print(f'recieved play command: {context.message.content}')
+	await joinVoice(context)
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if not currentVoice.is_playing():
+			source = FFmpegPCMAudio('audioSource.mp3')
+			player = currentVoice.play(source)
+		else:
+			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
+
+@client.command(name='stop')
+async def stop(context):
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if currentVoice.is_playing():
+			currentVoice.stop()
+		else:
+			await context.message.channel.send("No audio is currently playing.")
+	else:
+		await context.message.channel.send("No audio is currently playing.")
+
+# --- MESSAGE HANDLING ---
 @client.event
 async def on_message(message):
     if message.author == client.user:
