@@ -105,7 +105,7 @@ async def play(context):
 	await joinVoice(context)
 	if client.voice_clients:
 		currentVoice = client.voice_clients[0]
-		if not currentVoice.is_playing():
+		if not currentVoice.is_playing() and not currentVoice.is_paused():
 			async with context.typing():
 				url = context.message.content
 				url = url.replace('!play ', '')
@@ -127,7 +127,7 @@ async def play(context):
 			else:
 				await context.message.channel.send(f'**Error**: *Could not play given url.*')	
 		else:
-			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
+			await context.message.channel.send("Currently playing music. Please use !stop to stop current music.")
 
 # - Stop Audio -
 # Will stop audio currently playing. Cannot resume audio.
@@ -137,6 +137,7 @@ async def stop(context):
 		currentVoice = client.voice_clients[0]
 		if currentVoice.is_playing():
 			currentVoice.stop()
+			await context.message.channel.send("Audio has been stopped and ended.")
 		else:
 			await context.message.channel.send("No audio is currently playing.")
 	else:
