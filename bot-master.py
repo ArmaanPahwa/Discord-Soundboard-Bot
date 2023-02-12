@@ -37,7 +37,11 @@ class YTDLSource(discord.PCMVolumeTransformer):
 	@classmethod
 	async def from_url(cls, url, *, loop=None, stream=False):
 		loop = loop or asyncio.get_event_loop()
-		data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+		try:
+			data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+		except:
+			print(f'Caught error downloading link: {url}')
+			return None
 		if 'entries' in data:
 			# take first item from a playlist
 			data = data['entries'][0]
@@ -106,9 +110,13 @@ async def play(context):
 
 				#By default will stream
 				youtubeSource = await YTDLSource.from_url(url, loop=client.loop, stream=not download_flag)
-				currentVoice.play(youtubeSource,after=lambda e: print('Player error: %s' % e) if e else None)
-				print(f'Playing file: {youtubeSource.title}')
-			await context.message.channel.send(f'**Now Playing:** {youtubeSource.title}')
+				if youtubeSource != None:
+					currentVoice.play(youtubeSource,after=lambda e: print('Player error: %s' % e) if e else None)
+					print(f'Playing file: {youtubeSource.title}')
+			if youtubeSource != None:
+				await context.message.channel.send(f'**Now Playing:** {youtubeSource.title}')
+			else:
+				await context.message.channel.send(f'**Error**: *Could not play given url.*')	
 		else:
 			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
 
