@@ -3,6 +3,7 @@
 Enhance your discord experience with this Discord Musicbot! This bot will allow users to listen to their own custom music downloads and links in any of their voicechannels! 
 
 ## Commands
+- **!help**: Displays all commands and how to use them
 - **!play** `url`/`query`: Joins voice channel of user and streams the specified youtube url / first result of query
 - **!play download** `url`/`query`: Joins voice channel of user and downloads the specified youtube url / first result of query. Then plays it from file
 - **!stop**: Stops playing the current audio song

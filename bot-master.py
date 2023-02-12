@@ -50,6 +50,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 #Setup client prefix & Intents, queue
 client = commands.Bot(command_prefix='!', intents=discord.Intents.all()) #Declare all intents for full perms
+client.remove_command('help')
 music_queue = []
 current_song = ""
 
@@ -169,6 +170,8 @@ async def resume_audio(context):
 	else:
 		await context.message.channel.send("No audio is currently playing.")
 
+### --- QUEUE COMMANDS ---
+
 @client.command(name='add')
 async def add(context):
 	title = context.message.content
@@ -200,6 +203,18 @@ async def showQueue(context):
 	await context.message.channel.send(embed=embed)
 
 
+# --- INFORMATION ---
+@client.command(name='help')
+async def helpMenu(context):
+	embed = discord.Embed(title=f'Fizzix Musicbot', description= 'Discord bot for all your music needs! My prefix is: **!**', colour=discord.Colour.blue())
+	commands = '''
+	**!play [url / search query]**: streams the youtube url/search result
+	**!play download [url / search query]**: downloads & plays the youtube url/search result
+	**!stop**: stops & ends the current audio track
+	**!pause**: pauses the current audio player
+	**!resume**: resumes the paused audio player'''
+	embed.add_field(name='Commands\n', value=commands, inline=False)
+	await context.message.channel.send(embed=embed)
 # --- MESSAGE HANDLING ---
 @client.event
 async def on_message(message):
