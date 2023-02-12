@@ -1,78 +1,68 @@
-# This is the master code for the bot
-
-# bot-master.py
 import os
-from functools import partial
-import youtube_dl
-
 import discord
+import youtube_dl
 from discord.ext import commands
 from discord import FFmpegPCMAudio
 
+### SET-UP Envoirnmental Variables
 from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-ytdl_options = {
+# -- MUSIC --
+youtube_dl.utils.bug_reports_message = lambda: ''
+ytdl_format_options = {
 	'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0', 
-	'postprocessors': [{
-			'key': 'FFmpegExtractAudio',
-			'preferredcodec': 'mp3',
-			'preferredquality': '192',
-		}]
+	'restrictfilenames': True,
+	'noplaylist': True,
+	'nocheckcertificate': True,
+	'ignoreerrors': False,
+	'logtostderr': False,
+	'quiet': True,
+	'no_warnings': True,
+	'default_search': 'auto',
+	'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
-
 ffmpeg_options = {
-	'before_options': '-nostdin',
 	'options': '-vn'
 }
-
-ytdl = youtube_dl.YoutubeDL(ytdl_options)
-
-class YoutubeSource(discord.PCMVolumeTransformer):
-	def __init__(self, source, *, data, volume=1.0):
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+class YTDLSource(discord.PCMVolumeTransformer):
+	def __init__(self, source, *, data, volume=0.5):
 		super().__init__(source, volume)
 		self.data = data
 		self.title = data.get('title')
-		self.url = data.get('webpage_url')
-	
+		self.url = data.get('url')
 	@classmethod
-	async def stream_url(cls, url, *, loop=None, download=False):
-		loop = loop
-		command = partial(ytdl.extract_info, url=url, download=download)
-		data = await loop.run_in_executor(None, command)
+	async def from_url(cls, url, *, loop=None, stream=False):
+		loop = loop or asyncio.get_event_loop()
+		try:
+			data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+		except:
+			print(f'Caught error downloading link: {url}')
+			return None
 		if 'entries' in data:
+			# take first item from a playlist
 			data = data['entries'][0]
-		return cls(discord.FFmpegPCMAudio(data['url'], **ffmpeg_options), data=data)
+		filename = data['url'] if stream else ytdl.prepare_filename(data)
+		return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
-client = commands.Bot(command_prefix='$')
+#Setup client prefix & Intents, queue
+client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+music_queue = []
+current_song = ""
 
+# --- SETUP EVENT ---
 @client.event
 async def on_ready():
 	print(f'{client.user.name} has connected to Discord!')
-	guild = discord.utils.get(client.guilds, name=GUILD)
 	print(f'{client.user.name} is connected to the following server:\n')
-	print(f'{guild.name}(id:{guild.id})')
+	for guild in client.guilds:
+		print(f'{guild.name}(id:{guild.id})')
 	await client.change_presence(activity=discord.Game("Jamming out to music"))
 
-@client.command(name='logout')
-async def logout(context):
-	await leaveVoice(context)
-	await context.message.channel.send("Bot signing off...")
-	await client.change_presence(status=discord.Status.offline)
-	await client.logout()
-
+### --- CONNECT AND DISCONNECT COMMANDS ---
 @client.command(name='connect')
 async def joinVoice(context):
 	if not context.message.author.voice:
@@ -92,44 +82,42 @@ async def leaveVoice(context):
 		await joinedChannel.disconnect()
 		await context.message.channel.send("Successfully disconnected from voice channel.")
 
+### --- LOGOUT COMMAND ---
+@client.command(name='logout')
+async def logout(context):
+	await leaveVoice(context)
+	await context.message.channel.send("Bot signing off... See you next time!")
+	await client.change_presence(status=discord.Status.offline)
+	await client.close()
+
+### --- MUSIC COMMANDS ---
 @client.command(name='play')
 async def play(context):
+	print(f'recieved play command: {context.message.content}')
 	await joinVoice(context)
 	if client.voice_clients:
 		currentVoice = client.voice_clients[0]
 		if not currentVoice.is_playing():
-			source = FFmpegPCMAudio('audioSource.mp3')
-			player = currentVoice.play(source)
-		else:
-			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
+			async with context.typing():
+				url = context.message.content
+				url = url.replace('!play ', '')
+				#If used as !play download <url> you can download file. Slower but more accurate
+				download_flag = False
+				if url.startswith('download'):
+					url = url.replace('download ', '')
+					download_flag = True
+					print(f'Downloading file: {url}')
+					await context.message.channel.send(f'*Downloading file...*')
 
-
-async def youtube_download(url):
-	ydl_opts = {
-		'format': 'bestaudio/best',
-		'postprocessors': [{
-			'key': 'FFmpegExtractAudio',
-			'preferredcodec': 'mp3',
-			'preferredquality': '192',
-		}],
-	}
-	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-		ydl.download([url])
-
-
-@client.command(name='download')
-async def download(context, url):
-	await youtube_download(url)
-
-@client.command(name='stream')
-async def youtube_stream(context, url):
-	player = await YoutubeSource.stream_url(url, loop=client.loop, download=False)
-	await joinVoice(context)
-	if client.voice_clients:
-		currentVoice = client.voice_clients[0]
-		if not currentVoice.is_playing():
-			currentVoice.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-			await context.message.channel.send(f'Now playing: {player.title}')
+				#By default will stream
+				youtubeSource = await YTDLSource.from_url(url, loop=client.loop, stream=not download_flag)
+				if youtubeSource != None:
+					currentVoice.play(youtubeSource,after=lambda e: print('Player error: %s' % e) if e else None)
+					print(f'Playing file: {youtubeSource.title}')
+			if youtubeSource != None:
+				await context.message.channel.send(f'**Now Playing:** {youtubeSource.title}')
+			else:
+				await context.message.channel.send(f'**Error**: *Could not play given url.*')	
 		else:
 			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
 
@@ -139,44 +127,53 @@ async def stop(context):
 		currentVoice = client.voice_clients[0]
 		if currentVoice.is_playing():
 			currentVoice.stop()
-			await currentVoice.disconnect()
 		else:
 			await context.message.channel.send("No audio is currently playing.")
 	else:
 		await context.message.channel.send("No audio is currently playing.")
 
-@client.command(name='pause')
-async def pause_audio(context):
-	if client.voice_clients:
-		currentVoice = client.voice_clients[0]
-		if currentVoice.is_playing():
-			currentVoice.pause()
-			await context.message.channel.send("Audio has been paused!")
-		else:
-			await context.message.channel.send("No audio is currently playing.")
-	else:
-		await context.message.channel.send("No audio is currently playing.")
+@client.command(name='add')
+async def add(context):
+	title = context.message.content
+	title = title.replace('!add ', '')
+	music_queue.append(title)
+	await context.message.channel.send(f'Added song: `{title}` to the queue.')
 
-@client.command(name='resume')
-async def resume_audio(context):
-	if client.voice_clients:
-		currentVoice = client.voice_clients[0]
-		if currentVoice.is_paused():
-			currentVoice.resume()
-			await context.message.channel.send("Audio has been resumed!")
+@client.command(name='remove')
+async def remove(context):
+	position = context.message.content
+	position = position.replace('!remove ', '')
+	try:
+		pos = int(position)
+		pos -= 1 #If 1 is entered, position in list is 0
+		if pos < 0 or pos >= len(music_queue):
+			await context.message.channel.send(f'Error, please enter a valid position')
 		else:
-			await context.message.channel.send("No audio has been paused.")
-	else:
-		await context.message.channel.send("No audio is currently playing.")
+			title = music_queue.pop(pos)
+			await context.message.channel.send(f'Removed song: `{title}`')
+	except ValueError:
+		await context.message.channel.send(f"Please enter a valid numerical input {context.message.author.mention}")
 
+@client.command(name='queue')
+async def showQueue(context):
+	embed = discord.Embed(title=f'Music Queue', colour=discord.Colour.blue())
+	embed.add_field(name='Current song\n', value=current_song)
+	###Add for loop
+	embed.add_field(name='\nNext songs', value=f'\n'.join(music_queue))
+	await context.message.channel.send(embed=embed)
+
+
+# --- MESSAGE HANDLING ---
 @client.event
 async def on_message(message):
-	if message.author == client:
+	if message.author == client.user:
 		return
+	
+	print(f'Message from {message.author}: {message.content}')
 
 	if message.content.startswith('hello bot'):
 		await message.channel.send(f'Hello {message.author.mention}!')
-	
+
 	await client.process_commands(message)
 
 client.run(TOKEN)

@@ -1,23 +1,31 @@
-# Discord-Soundboard-Bot
+# Discord-Musicbot
 
-Enhance your discord experience with this Discord Soundboard Bot! This bot will allow users to create their own custom sounboards and store their favorite sounds to play in voice channels at anytime!
+Enhance your discord experience with this Discord Musicbot! This bot will allow users to listen to their own custom music downloads and links in any of their voicechannels! 
+
+## Commands
+- **!play** `url`: Joins voice channel of user and streams the specified youtube url 
+- **!play download** `url`: Joins voice channel of user and downloads the specified youtube url. Then plays it from file
+- **!stop**: Stops playing the current audio song
+- **!logout**: Disconnects from any active voice and disconnects from discord
+- **!connect**: Connects to voice (debug)
+- **disconnect**: Disconnects to voice (debug)
 
 ## Current Functionality
 - Join Discord Guild/Server's voice-chat
-- Play local audio file indentified in Source code
-- Play audio from remote source
+- Play youtube audio through download
+- Play youtube audio through streaming
 
 ## To-Do
-- Create separate soundboard for each user
-- Ability to manipulate user soundboard
-- Admin controls
+- Implement pause/resume command
+- Implement a queue system
+- Implement song skipping
 
 ## Technologies Used
 - **[VScode](https://code.visualstudio.com/)**: Code editor
 - **[Discord](https://discord.com/)**: Digital communication application
 - **[FFmpeg](https://ffmpeg.org/download.html)**: Audio source converter
 
-## How to use
+## How to install
 This bot is to be used on the [Discord](https://discord.com/) platform. As such, you must create an account to be able to use the application and bot. 
 
 ### Creating the bot information
@@ -25,7 +33,7 @@ Once an account is created, follow these steps:
 1. Navigate to the [Discord Developer Portal](https://discord.com/developers/applications).
 2. Click the "Create Application" button at the top right.
 3. Give a ***unique name*** to your application and click the create button.
-4. Once created, navigate to the bot tab.
+4. Once created, navigate to the `BOT` tab on the left menu.
 5. Click on "Add Bot" and then confirm with "Yes, do it!".
 6. Your bot has been created!
 
@@ -37,6 +45,11 @@ With the bot now being created, you must add it to your Discord Guild/Server. Fo
 4. In the scopes section, click copy next to the generated link.
 5. Paste the link into a new tab and select your Guild/Server to join.
 
+### Update Bot Permissions
+To properly allow your bot to interact, we must update the intents of the bot.
+1. Navigate to the `BOT` tab on the left menu.
+2. Scroll down to the Privileged Gateway Intents section
+3. Select the radio button for PRESENCE INTENT, SERVER MEMBERS INTENT, and MESSAGE CONTENT INTENT
 
 ### Installing/Managing Packages
 Your bot now has access to your Guild/Server. The final steps to get the bot running is as follows:
@@ -65,7 +78,7 @@ If this package was not installed, open the `bot-master.py` in an editor and do 
    ```
 
 ### Running the Bot
-You should now be able to run the `bot-master.py` with full functionality through command-line!
+You should now be able to run the `bot.py` with full functionality through command-line!
 
 ## Packages
 ***Ensure you have [Python](https://www.python.org/downloads/) Downloaded***
@@ -88,7 +101,9 @@ You can open a new issue [through this](https://github.com/ArmaanPahwa/Discord-S
 ## References
 The following resources were referenced when developing the code:
 - [Discord.py API Documentation](https://discordpy.readthedocs.io/en/latest/index.html): Official API documentation for the discord.py package
+- [Official discord.py Github](https://github.com/Rapptz/discord.py): Official discord.py github for developers to reference
+-[PythonLand tutorial](https://python.land/build-discord-bot-in-python-that-plays-music): Guide for downloading & streaming youtube files (2023 updated method)
+- [Fix Youtube Streaming](https://stackoverflow.com/questions/60241517/discord-py-rewrite-and-youtube-dl): Fix for how to stream music based on official github repo
 - [Ajay Gandecha](https://www.youtube.com/playlist?list=PLfpeXtDSa8rWW02LOjl2IW9_TLfcp_mZr): Youtube series for basic discord bot functionality
 - [Beau Carnes, Freecodecamp.org](https://www.freecodecamp.org/news/create-a-discord-bot-with-python/): Guide for beginners creating a discord bot
 - [Alex Ronquillo, realpython.com](https://realpython.com/how-to-make-a-discord-bot-python/): Guide for beginners creating a discord bot
-- [Official discord.py Github](https://github.com/Rapptz/discord.py): Official discord.py github for developers to reference
