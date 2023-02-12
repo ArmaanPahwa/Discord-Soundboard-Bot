@@ -94,3 +94,4 @@ The following resources were referenced when developing the code:
 - [Beau Carnes, Freecodecamp.org](https://www.freecodecamp.org/news/create-a-discord-bot-with-python/): Guide for beginners creating a discord bot
 - [Alex Ronquillo, realpython.com](https://realpython.com/how-to-make-a-discord-bot-python/): Guide for beginners creating a discord bot
 - [Official discord.py Github](https://github.com/Rapptz/discord.py): Official discord.py github for developers to reference
+-[PythonLand tutorial](https://python.land/build-discord-bot-in-python-that-plays-music): Guide for downloading & streaming youtube files (2023 updated method)
