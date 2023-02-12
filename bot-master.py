@@ -35,7 +35,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 		self.title = data.get('title')
 		self.url = data.get('url')
 	@classmethod
-	async def from_url(cls, url, *, loop=None, stream=False):
+	async def from_url(cls, url, *, loop=None, stream=False): #Also supports basic query
 		loop = loop or asyncio.get_event_loop()
 		try:
 			data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
@@ -49,7 +49,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 		return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
 #Setup client prefix & Intents, queue
-client = commands.Bot(command_prefix='!', intents=discord.Intents.all())
+client = commands.Bot(command_prefix='!', intents=discord.Intents.all()) #Declare all intents for full perms
 music_queue = []
 current_song = ""
 
@@ -63,6 +63,8 @@ async def on_ready():
 	await client.change_presence(activity=discord.Game("Jamming out to music"))
 
 ### --- CONNECT AND DISCONNECT COMMANDS ---
+# - Connect -
+# Will connect to voice channel of user
 @client.command(name='connect')
 async def joinVoice(context):
 	if not context.message.author.voice:
@@ -76,6 +78,8 @@ async def joinVoice(context):
 		await context.message.author.voice.channel.connect()
 		await context.message.channel.send(f'Joined the {context.message.author.voice.channel.name} voice channel!')
 
+# - Disconnect -
+# Will disconnect from voice channel of user
 @client.command(name='disconnect')
 async def leaveVoice(context):
 	for joinedChannel in client.voice_clients:
@@ -83,6 +87,7 @@ async def leaveVoice(context):
 		await context.message.channel.send("Successfully disconnected from voice channel.")
 
 ### --- LOGOUT COMMAND ---
+# Will disconnect from voice channel and stop audio. Then will terminate program.
 @client.command(name='logout')
 async def logout(context):
 	await leaveVoice(context)
@@ -91,6 +96,8 @@ async def logout(context):
 	await client.close()
 
 ### --- MUSIC COMMANDS ---
+# - Play Audio -
+# Cannot play audio if another is playing. If audio is paused/stopped, will start a new audio and discard old
 @client.command(name='play')
 async def play(context):
 	print(f'recieved play command: {context.message.content}')
@@ -121,6 +128,8 @@ async def play(context):
 		else:
 			await context.message.channel.send("Currently playing music. Please wait for audio to complete.")
 
+# - Stop Audio -
+# Will stop audio currently playing. Cannot resume audio.
 @client.command(name='stop')
 async def stop(context):
 	if client.voice_clients:
@@ -132,6 +141,8 @@ async def stop(context):
 	else:
 		await context.message.channel.send("No audio is currently playing.")
 
+# - Pause Audio -
+# Will pause playing audio. Can replay audio through resume.
 @client.command(name='pause')
 async def pause(context):
 	if client.voice_clients:
@@ -144,6 +155,8 @@ async def pause(context):
 	else:
 		await context.message.channel.send("No audio is currently playing.")
 
+# - Resume Audio -
+# Will resume a paused audio. Cannot resume stopped audio.
 @client.command(name='resume')
 async def resume_audio(context):
 	if client.voice_clients:
@@ -193,7 +206,7 @@ async def on_message(message):
 	if message.author == client.user:
 		return
 	
-	print(f'Message from {message.author}: {message.content}')
+	print(f'Message from {message.author}: {message.content}') #Console print
 
 	if message.content.startswith('hello bot'):
 		await message.channel.send(f'Hello {message.author.mention}!')
