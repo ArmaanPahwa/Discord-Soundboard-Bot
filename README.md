@@ -101,8 +101,9 @@ You can open a new issue [through this](https://github.com/ArmaanPahwa/Discord-S
 ## References
 The following resources were referenced when developing the code:
 - [Discord.py API Documentation](https://discordpy.readthedocs.io/en/latest/index.html): Official API documentation for the discord.py package
+- [Official discord.py Github](https://github.com/Rapptz/discord.py): Official discord.py github for developers to reference
+-[PythonLand tutorial](https://python.land/build-discord-bot-in-python-that-plays-music): Guide for downloading & streaming youtube files (2023 updated method)
+- [Fix Youtube Streaming](https://stackoverflow.com/questions/60241517/discord-py-rewrite-and-youtube-dl): Fix for how to stream music based on official github repo
 - [Ajay Gandecha](https://www.youtube.com/playlist?list=PLfpeXtDSa8rWW02LOjl2IW9_TLfcp_mZr): Youtube series for basic discord bot functionality
 - [Beau Carnes, Freecodecamp.org](https://www.freecodecamp.org/news/create-a-discord-bot-with-python/): Guide for beginners creating a discord bot
 - [Alex Ronquillo, realpython.com](https://realpython.com/how-to-make-a-discord-bot-python/): Guide for beginners creating a discord bot
-- [Official discord.py Github](https://github.com/Rapptz/discord.py): Official discord.py github for developers to reference
--[PythonLand tutorial](https://python.land/build-discord-bot-in-python-that-plays-music): Guide for downloading & streaming youtube files (2023 updated method)
