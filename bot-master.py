@@ -132,6 +132,30 @@ async def stop(context):
 	else:
 		await context.message.channel.send("No audio is currently playing.")
 
+@client.command(name='pause')
+async def pause(context):
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if currentVoice.is_playing():
+			currentVoice.pause()
+			await context.message.channel.send("Audio has been paused!")
+		else:
+			await context.message.channel.send("No audio is currently playing.")
+	else:
+		await context.message.channel.send("No audio is currently playing.")
+
+@client.command(name='resume')
+async def resume_audio(context):
+	if client.voice_clients:
+		currentVoice = client.voice_clients[0]
+		if currentVoice.is_paused():
+			currentVoice.resume()
+			await context.message.channel.send("Audio has been resumed!")
+		else:
+			await context.message.channel.send("No audio has been paused.")
+	else:
+		await context.message.channel.send("No audio is currently playing.")
+
 @client.command(name='add')
 async def add(context):
 	title = context.message.content
