@@ -107,6 +107,7 @@ async def play(context):
 					url = url.replace('download ', '')
 					download_flag = True
 					print(f'Downloading file: {url}')
+					await context.message.channel.send(f'*Downloading file...*')
 
 				#By default will stream
 				youtubeSource = await YTDLSource.from_url(url, loop=client.loop, stream=not download_flag)
