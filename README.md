@@ -2,19 +2,30 @@
 
 Enhance your discord experience with this Discord Musicbot! This bot will allow users to listen to their own custom music downloads and links in any of their voicechannels! 
 
+## Commands
+- **!play** `url`: Joins voice channel of user and streams the specified youtube url 
+- **!play download** `url`: Joins voice channel of user and downloads the specified youtube url. Then plays it from file
+- **!stop**: Stops playing the current audio song
+- **!logout**: Disconnects from any active voice and disconnects from discord
+- **!connect**: Connects to voice (debug)
+- **disconnect**: Disconnects to voice (debug)
+
 ## Current Functionality
 - Join Discord Guild/Server's voice-chat
+- Play youtube audio through download
+- Play youtube audio through streaming
 
 ## To-Do
-- Play local audio file indentified in Source code
-- Play audio from remote source
+- Implement pause/resume command
+- Implement a queue system
+- Implement song skipping
 
 ## Technologies Used
 - **[VScode](https://code.visualstudio.com/)**: Code editor
 - **[Discord](https://discord.com/)**: Digital communication application
 - **[FFmpeg](https://ffmpeg.org/download.html)**: Audio source converter
 
-## How to use
+## How to install
 This bot is to be used on the [Discord](https://discord.com/) platform. As such, you must create an account to be able to use the application and bot. 
 
 ### Creating the bot information
