@@ -35,6 +35,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 		self.data = data
 		self.title = data.get('title')
 		self.url = data.get('url')
+		self.webpage = data.get('webpage_url')
 	@classmethod
 	async def from_url(cls, url, *, loop=None, stream=False): #Also supports basic query
 		loop = loop or asyncio.get_event_loop()
@@ -49,11 +50,24 @@ class YTDLSource(discord.PCMVolumeTransformer):
 		filename = data['url'] if stream else ytdl.prepare_filename(data)
 		return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
+class SongInfo():
+	def __init__(self, author, title, url):
+		self.author = author
+		self.title = title
+		self.url = url
+	@classmethod
+	def getUrl():
+		return self.url
+	@classmethod
+	def getTitle():
+		return self.title
+
 #Setup client prefix & Intents, queue
 client = commands.Bot(command_prefix='!', intents=discord.Intents.all()) #Declare all intents for full perms
 client.remove_command('help')
 music_queue = []
-current_song = ""
+global current_song 
+current_song = SongInfo(None, '', None)
 
 # --- SETUP EVENT ---
 @client.event
@@ -122,6 +136,10 @@ async def play(context):
 				youtubeSource = await YTDLSource.from_url(url, loop=client.loop, stream=not download_flag)
 				if youtubeSource != None:
 					currentVoice.play(youtubeSource,after=lambda e: print('Player error: %s' % e) if e else None)
+					#print(youtubeSource)
+					global current_song 
+					print(youtubeSource.webpage)
+					current_song = SongInfo(context.message.author, youtubeSource.title, youtubeSource.webpage)
 					print(f'Playing file: {youtubeSource.title}')
 			if youtubeSource != None:
 				await context.message.channel.send(f'**Now Playing:** {youtubeSource.title}')
@@ -172,6 +190,20 @@ async def resume_audio(context):
 	else:
 		await context.message.channel.send("No audio is currently playing.")
 
+# - Show Current Audio -
+# Will display information about the current song
+@client.command(name='np')
+async def nowPlaying(context):
+	if current_song.title != '':
+		embed = discord.Embed(title='Now Playing', 
+		url=current_song.url, 
+		description=current_song.title,
+		colour=discord.Colour.blue())
+		
+		await context.message.channel.send(embed=embed)
+	else:
+		await context.message.channel.send('No song is currently playing.')
+
 ### --- QUEUE COMMANDS ---
 
 @client.command(name='add')
@@ -199,7 +231,7 @@ async def remove(context):
 @client.command(name='queue')
 async def showQueue(context):
 	embed = discord.Embed(title=f'Music Queue', colour=discord.Colour.blue())
-	embed.add_field(name='Current song\n', value=current_song)
+	embed.add_field(name='Current song\n', value=current_song.title)
 	###Add for loop
 	embed.add_field(name='\nNext songs', value=f'\n'.join(music_queue))
 	await context.message.channel.send(embed=embed)
