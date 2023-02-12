@@ -99,7 +99,7 @@ async def play(context):
 			async with context.typing():
 				url = context.message.content
 				url = url.replace('!play ', '')
-				print(f'Downloading file: {filename}')
+				print(f'Downloading file: {url}')
 				filename = await YTDLSource.from_url(url, loop=client.loop)
 				currentVoice.play(discord.FFmpegPCMAudio(executable="ffmpeg.exe", source=filename))
 				print(f'Playing file: {filename}')
