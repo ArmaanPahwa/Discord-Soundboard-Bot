@@ -65,6 +65,8 @@ If the [dotenv](https://github.com/theskumar/python-dotenv) package is installed
 3. Add the following line:
    ```shell
    DISCORD_TOKEN=<your Discord Bot Token copied from the Developer Portal>
+   DISCORD_BOT_NAME=<your Discord Bot name>
+   DISCORD_BOT_DESC=<your Discord Bot description>
    ```
 4. Replace `<your Discord Bot Token copied from the Developer Portal>` with your copied Token.
 
