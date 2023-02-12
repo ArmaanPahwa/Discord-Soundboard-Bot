@@ -8,7 +8,8 @@ from discord import FFmpegPCMAudio
 from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
+NAME = os.getenv('DISCORD_BOT_NAME')
+DESC  = os.getenv('DISCORD_BOT_DESC')
 
 # -- MUSIC --
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -207,7 +208,7 @@ async def showQueue(context):
 # --- INFORMATION ---
 @client.command(name='help')
 async def helpMenu(context):
-	embed = discord.Embed(title=f'Fizzix Musicbot', description= 'Discord bot for all your music needs! My prefix is: **!**', colour=discord.Colour.blue())
+	embed = discord.Embed(title=NAME, description= DESC, colour=discord.Colour.blue())
 	commands = '''
 	**!play [url / search query]**: streams the youtube url/search result
 	**!play download [url / search query]**: downloads & plays the youtube url/search result
