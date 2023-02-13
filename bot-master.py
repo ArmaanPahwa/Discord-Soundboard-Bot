@@ -1,6 +1,7 @@
 import os
 import discord
 import youtube_dl
+import asyncio
 from discord.ext import commands
 from discord import FFmpegPCMAudio
 
@@ -133,13 +134,12 @@ async def play(context):
 				#By default will stream
 				youtubeSource = await YTDLSource.from_url(url, loop=client.loop, stream=not download_flag)
 				if youtubeSource != None:
+					await asyncio.sleep(0.5) #To help with song speeding up at start
 					currentVoice.play(youtubeSource,after=lambda e: print('Player error: %s' % e) if e else None)
-					#print(youtubeSource)
 					global current_song 
 					current_song = SongInfo(context.message.author, youtubeSource.title, youtubeSource.webpage, youtubeSource.duration, youtubeSource.thumbnail)
 					print(f'Playing file: {youtubeSource.title}')
 			if youtubeSource != None:
-				#await context.message.channel.send(f'**Now Playing:** {youtubeSource.title}')
 				await nowPlaying(context)
 			else:
 				await context.message.channel.send(f'**Error**: *Could not play given url.*')	
