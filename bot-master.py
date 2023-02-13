@@ -195,11 +195,12 @@ async def resume_audio(context):
 @client.command(name='np')
 async def nowPlaying(context):
 	if current_song.title != '':
-		embed = discord.Embed(title='Now Playing', 
+		embed = discord.Embed(title=current_song.title, 
 		url=current_song.url, 
-		description=current_song.title,
+		description=f'Requested by **{current_song.author.display_name}**',
 		colour=discord.Colour.blue())
-		
+		#embed.set_author(name=current_song.author.display_name, icon_url=current_song.author.display_avatar.url)
+		embed.set_author(name='Now Playing ♫', icon_url='https://i.imgur.com/YDklpTp.jpg')
 		await context.message.channel.send(embed=embed)
 	else:
 		await context.message.channel.send('No song is currently playing.')
