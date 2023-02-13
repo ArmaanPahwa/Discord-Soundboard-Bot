@@ -36,6 +36,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
 		self.title = data.get('title')
 		self.url = data.get('url')
 		self.webpage = data.get('webpage_url')
+		self.thumbnail = data.get('thumbnail')
+		self.duration = data.get('duration')
 	@classmethod
 	async def from_url(cls, url, *, loop=None, stream=False): #Also supports basic query
 		loop = loop or asyncio.get_event_loop()
@@ -51,23 +53,19 @@ class YTDLSource(discord.PCMVolumeTransformer):
 		return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
 class SongInfo():
-	def __init__(self, author, title, url):
+	def __init__(self, author, title, url, duration, thumbnail=None):
 		self.author = author
 		self.title = title
 		self.url = url
-	@classmethod
-	def getUrl():
-		return self.url
-	@classmethod
-	def getTitle():
-		return self.title
+		self.duration = duration
+		self.thumbnail = thumbnail
 
 #Setup client prefix & Intents, queue
 client = commands.Bot(command_prefix='!', intents=discord.Intents.all()) #Declare all intents for full perms
 client.remove_command('help')
 music_queue = []
 global current_song 
-current_song = SongInfo(None, '', None)
+current_song = SongInfo(None, '', None, None)
 
 # --- SETUP EVENT ---
 @client.event
@@ -138,11 +136,11 @@ async def play(context):
 					currentVoice.play(youtubeSource,after=lambda e: print('Player error: %s' % e) if e else None)
 					#print(youtubeSource)
 					global current_song 
-					print(youtubeSource.webpage)
-					current_song = SongInfo(context.message.author, youtubeSource.title, youtubeSource.webpage)
+					current_song = SongInfo(context.message.author, youtubeSource.title, youtubeSource.webpage, youtubeSource.duration, youtubeSource.thumbnail)
 					print(f'Playing file: {youtubeSource.title}')
 			if youtubeSource != None:
-				await context.message.channel.send(f'**Now Playing:** {youtubeSource.title}')
+				#await context.message.channel.send(f'**Now Playing:** {youtubeSource.title}')
+				await nowPlaying(context)
 			else:
 				await context.message.channel.send(f'**Error**: *Could not play given url.*')	
 		else:
@@ -195,12 +193,15 @@ async def resume_audio(context):
 @client.command(name='np')
 async def nowPlaying(context):
 	if current_song.title != '':
+		minutes, seconds = divmod(current_song.duration, 60)
 		embed = discord.Embed(title=current_song.title, 
 		url=current_song.url, 
-		description=f'Requested by **{current_song.author.display_name}**',
+		description=f'Requested by **{current_song.author.display_name}**\nDuration: {minutes}:{seconds} minutes',
 		colour=discord.Colour.blue())
 		#embed.set_author(name=current_song.author.display_name, icon_url=current_song.author.display_avatar.url)
 		embed.set_author(name='Now Playing ♫', icon_url='https://i.imgur.com/YDklpTp.jpg')
+		if current_song.thumbnail != None:
+			embed.set_thumbnail(url=current_song.thumbnail)
 		await context.message.channel.send(embed=embed)
 	else:
 		await context.message.channel.send('No song is currently playing.')
