@@ -67,6 +67,8 @@ client.remove_command('help')
 music_queue = []
 global current_song 
 current_song = SongInfo(None, '', None, None)
+global loop_flag
+loop_flag = False
 
 # --- SETUP EVENT ---
 @client.event
@@ -116,7 +118,8 @@ async def logout(context):
 # Cannot play audio if another is playing. If audio is paused/stopped, will start a new audio and discard old
 @client.command(name='play')
 async def play(context):
-	print(f'recieved play command: {context.message.content}')
+	if not loop_flag:
+		print(f'recieved play command: {context.message.content}')
 	await joinVoice(context)
 	if client.voice_clients:
 		currentVoice = client.voice_clients[0]
@@ -129,23 +132,31 @@ async def play(context):
 				if url.startswith('download'):
 					url = url.replace('download ', '')
 					download_flag = True
-					print(f'Downloading file: {url}')
+					if not loop_flag:
+						print(f'Downloading file: {url}')
 					await context.message.channel.send(f'*Downloading file...*')
 
 				#By default will stream
 				youtubeSource = await YTDLSource.from_url(url, loop=client.loop, stream=not download_flag)
 				if youtubeSource != None:
 					await asyncio.sleep(0.5) #To help with song speeding up at start
-					currentVoice.play(youtubeSource,after=lambda e: print('Player error: %s' % e) if e else None)
+					currentVoice.play(youtubeSource,after=lambda e: print('Player error: %s' % e) if e else play_next(context))
 					global current_song 
 					current_song = SongInfo(context.message.author, youtubeSource.title, youtubeSource.webpage, youtubeSource.duration, youtubeSource.thumbnail)
-					print(f'Playing file: {youtubeSource.title}')
+					if not loop_flag:
+						print(f'Playing file: {youtubeSource.title}')
 			if youtubeSource != None:
-				await nowPlaying(context)
+				if not loop_flag:
+					await nowPlaying(context)
 			else:
 				await context.message.channel.send(f'**Error**: *Could not play given url.*')	
 		else:
 			await context.message.channel.send("Currently playing music. Please use !stop to stop current music.")
+
+def play_next(context):
+	if loop_flag:
+		#print('Looping')
+		asyncio.run_coroutine_threadsafe(play(context), client.loop)
 
 # - Stop Audio -
 # Will stop audio currently playing. Cannot resume audio.
@@ -155,6 +166,8 @@ async def stop(context):
 		currentVoice = client.voice_clients[0]
 		if currentVoice.is_playing():
 			currentVoice.stop()
+			if loop_flag:
+				await loopToggle(context)
 			await context.message.channel.send("Audio has been stopped and ended.")
 		else:
 			await context.message.channel.send("No audio is currently playing.")
@@ -188,6 +201,17 @@ async def resume_audio(context):
 			await context.message.channel.send("No audio has been paused.")
 	else:
 		await context.message.channel.send("No audio is currently playing.")
+
+# - Loop Audio -
+# Will toggle loop flag for song looping
+@client.command('loop')
+async def loopToggle(context):
+	global loop_flag
+	loop_flag = not loop_flag
+	if loop_flag:
+		await context.message.channel.send('Loop enabled.')
+	else:
+		await context.message.channel.send('Loop disabled.')
 
 # - Show Current Audio -
 # Will display information about the current song
@@ -249,7 +273,8 @@ async def helpMenu(context):
 	**!play download [url / search query]**: downloads & plays the youtube url/search result
 	**!stop**: stops & ends the current audio track
 	**!pause**: pauses the current audio player
-	**!resume**: resumes the paused audio player'''
+	**!resume**: resumes the paused audio player
+	**!loop**: Toggles looping of current audio. Only works with url entry.'''
 	embed.add_field(name='Commands\n', value=commands, inline=False)
 	await context.message.channel.send(embed=embed)
 # --- MESSAGE HANDLING ---

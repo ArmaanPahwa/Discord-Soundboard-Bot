@@ -9,6 +9,7 @@ Enhance your discord experience with this Discord Musicbot! This bot will allow 
 - **!stop**: Stops playing the current audio song
 - **!pause**: Pauses the audio
 - **!resume**: Resumes the audio
+- **!loop**: Toggles loop. (Only works with url entries)
 - **!logout**: Disconnects from any active voice and disconnects from discord
 - **!connect**: Connects to voice (debug)
 - **disconnect**: Disconnects to voice (debug)
