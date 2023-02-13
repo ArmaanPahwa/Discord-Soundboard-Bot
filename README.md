@@ -17,11 +17,12 @@ Enhance your discord experience with this Discord Musicbot! This bot will allow 
 - Join Discord Guild/Server's voice-chat
 - Play youtube audio through download
 - Play youtube audio through streaming
+- Implement pause/resume command
 
 ## To-Do
-- Implement pause/resume command
 - Implement a queue system
 - Implement song skipping
+- Implement playlist detection
 
 ## Technologies Used
 - **[VScode](https://code.visualstudio.com/)**: Code editor
