@@ -81,7 +81,7 @@ async def on_ready():
 # - Connect -
 # Will connect to voice channel of user
 @client.command(name='connect')
-async def joinVoice(context):
+async def joinVoice(context, msg=False):
 	if not context.message.author.voice:
 		await context.message.channel.send("You are not connected to a voice channel.")
 	elif client.voice_clients:
@@ -91,7 +91,8 @@ async def joinVoice(context):
 			await context.message.author.voice.channel.connect()
 	else:
 		await context.message.author.voice.channel.connect()
-		await context.message.channel.send(f'Joined the {context.message.author.voice.channel.name} voice channel!')
+		if msg:
+			await context.message.channel.send(f'Joined the {context.message.author.voice.channel.name} voice channel!')
 
 # - Disconnect -
 # Will disconnect from voice channel of user
